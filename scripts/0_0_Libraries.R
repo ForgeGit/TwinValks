@@ -1,0 +1,28 @@
+
+options(scipen = 100)
+options(Encoding="UTF-8")
+#install.packages("viridis")  # Install
+#install.packages(c("httr", "jsonlite","tidyverse","gtsummary","gghighlight"))
+library(httr)
+library(jsonlite)
+library(tidyverse)
+library(gtsummary)
+library(gghighlight)
+library(png)
+library(grid)
+library(viridis)
+library(ggplot2)
+library(showtext)
+#> Loading required package: sysfonts
+#> Loading required package: showtextdb
+library(ggrepel)
+library(cowplot)
+library(ggtext)
+library(extrafont)
+library(scales)
+library(ggridges)
+library(janitor)
+library(magick)
+library(jpeg)
+library(zoo)
+library(data.table)

@@ -1,0 +1,940 @@
+---
+title: "Twin Valkyrs"
+output: html_document
+date: "2023-09-12"
+---
+
+## Settings 
+
+### -Libraries
+
+```{r}
+knitr::opts_chunk$set(echo = TRUE)
+source("./scripts/0_0_Libraries.R")
+```
+
+### -Utils
+
+```{r}
+source(file = "./scripts/0_1_DownloadUtils.R")
+```
+
+### -Auth Token request
+
+```{r}
+## Run once
+# token <- POST("https://www.warcraftlogs.com/oauth/token",
+#           config = list(),
+#           body = list(
+#             grant_type="client_credentials",
+#             client_id=Sys.getenv("client_id"),
+#             client_secret=Sys.getenv("client_secret")))
+# 
+# token <- content(token,"parsed")
+# 
+# Manually copy token to .env file and load locally
+```
+
+```{r}
+token <- Sys.getenv("TOKEN")
+
+url <- "https://classic.warcraftlogs.com/api/v2"
+
+WCL_API2_request <- function(request) {
+  
+  tryCatch({
+    
+    request <- jsonlite::toJSON(list(query=request),
+                                auto_unbox=TRUE,
+                                bigint_as_char=F)
+    
+    
+    response <- POST(url,
+                     add_headers("Content-Type" = "application/json",
+                                 "Authorization"= paste0("Bearer ",
+                                                         token)),
+                     body = request,
+                     content_type_json(),
+                     encode = "json")
+    
+    response_formated <- fromJSON(content(response,
+                                          as = "text",
+                                          encoding="UTF-8"),
+                                  bigint_as_char=TRUE)
+    
+    return(response_formated)
+  }, error = function(e) {
+    # Handle the error here or return an informative message
+    cat("Error in WCL_API2_request:", e$message, " Request: ",request,"\n")
+    return(NULL)  # Return an appropriate value or error indicator
+  })
+}
+
+```
+
+## Download random log data
+
+```{r}
+source(file = "./scripts/1_0_logID_download.R")
+```
+
+### - Merge
+
+```{r}
+df1 <- read.csv("raw_data/past_logs/response_logs_code_df_TwinRAW_2023_09_21_h03_m57.csv")
+df2 <- read.csv("raw_data/past_logs/response_logs_code_df_TwinsRAW_2023_09_20_h03_m50.csv")
+df3 <- read.csv("raw_data/past_logs/response_logs_code_df2023_08_29.csv")
+df4 <- read.csv("raw_data/past_logs/response_logs_code_df_2023_09_22.csv")
+
+
+df <- bind_rows(df1,df2,df3,df4) %>%
+  distinct(code, .keep_all = TRUE) %>%
+  mutate(LogstartTime = as_datetime(as.POSIXct(startTime/1000, origin="1970-01-01")),
+         LogendTime = as_datetime(as.POSIXct(endTime/1000, origin="1970-01-01")),
+         logNote ="Random Logs") %>%
+  select(-c(X)) %>% rename(logID = code)
+```
+
+### - Encounter data
+
+```{r}
+logIDs <- unique(df$logID)
+
+request_encounter <- sprintf(request_encounter_str, logIDs)
+
+response_formatted_list <- lapply(seq_along(request_encounter), function(i) {  
+  
+  response <- WCL_API2_request(request_encounter[i])$data$reportData$report$fights 
+  
+  if (i %% 25 == 0) {
+    cat("Processed", i, "out of", length(request_encounter), "\n")
+  }
+  
+  if(!is.null(response) & length(response)>0) {
+    
+    response <- mutate(response, 
+                       duration = endTime - startTime,  
+                       duration_s = duration/1000,
+                       logID = as.character(logIDs[i]),
+                       logStart = as.character(df$LogstartTime[i]),
+                       logEnd = as.character(df$LogendTime[i]),
+                       logNote = as.character(df$logNote[i])
+    )
+    
+    response <- rename(response,fightID = id)
+    
+  } else {
+    response <- data.frame(logID = as.character(df$logID[i]),
+                           logStart = as.character(df$LogstartTime[i]),
+                           logNote = as.character(df$logNote[i]),
+                           fightID=0,
+                           encounterID=0
+                           
+    )
+  }
+  return(response)
+})
+
+encounter_response_list<- response_formatted_list
+rm(response_formatted_list)
+encounter_data <- do.call(bind_rows, encounter_response_list)
+
+write.csv(encounter_data,paste0("encounter_data",format(Sys.time(), "%Y_%m_%d_h%H_m%M"),".csv"))
+```
+
+
+## Download top log data
+
+```{r}
+source(file = "./scripts/1_1_rankings_download.R")
+```
+
+### - Merge
+
+```{r}
+df1 <- read.csv("raw_data/df_rankings_execution_2023_09_23_h14_m28.csv")
+df2 <- read.csv("raw_data/df_rankings_progress_2023_09_23_h14_m27.csv")
+df3 <- read.csv("raw_data/df_rankings_speed_2023_09_23_h14_m26.csv")
+
+df <- bind_rows(df1,df2,df3) %>%
+  distinct(report.code, .keep_all = TRUE) %>%
+  mutate(LogstartTime = as_datetime(as.POSIXct(report.startTime/1000, origin="1970-01-01")),
+         logNote ="Top Logs") %>%
+  select(-c(X)) %>% rename(logID = report.code)
+```
+
+### - Encounter data
+
+```{r}
+logIDs <- unique(df$logID)
+
+request_encounter <- sprintf(request_encounter_str, logIDs)
+
+output <- lapply(seq_along(request_encounter), function(i) {  
+  
+  response <- WCL_API2_request(request_encounter[i])$data$reportData$report$fights 
+  
+  if (i %% 25 == 0) {
+    cat("Processed", i, "out of", length(request_encounter), "\n")
+  }
+  
+  if(!is.null(response) & length(response)>0) {
+    
+    response <- mutate(response, 
+                       duration = endTime - startTime,  
+                       duration_s = duration/1000,
+                       logID = as.character(logIDs[i]),
+                       logStart = as.character(df$LogstartTime[i]),
+                       logNote = as.character(df$logNote[i])
+    )
+    
+    response <- rename(response,fightID = id)
+    
+  } else {
+    response <- data.frame(logID = as.character(df$logID[i]),
+                           logStart = as.character(df$LogstartTime[i]),
+                           logNote = as.character(df$logNote[i]),
+                           fightID=0,
+                           encounterID=0
+                           
+    )
+  }
+  return(response)
+})
+
+encounter_data_topLogs <- do.call(bind_rows, output)
+
+write.csv(encounter_data_topLogs,paste0("encounter_data_topLogs_",format(Sys.time(), "%Y_%m_%d_h%H_m%M"),".csv"))
+```
+
+
+## Process both logs
+
+```{r}
+encounter_data <- read.csv("encounter_data2023_09_22.csv")
+
+#encounter_data %>% filter(encounterID!=0) %>% group_by(logID) %>% summarise(n=n()) %>% nrow(.)
+
+twins_df <- ## 13,567
+encounter_data %>% filter(encounterID!=0) %>% 
+  filter(encounterID==641 & duration_s>=50) 
+
+#twins_df %>% group_by(logID) %>% summarise(n=n()) %>% nrow(.)
+
+
+twins_df <- twins_df%>%
+  
+  mutate(duration_s_filter = round(duration_s,1),
+         logdate = as.Date(logStart))%>%
+  
+  distinct(difficulty, size, kill, fightPercentage, 
+           duration_s_filter, averageItemLevel,logdate,
+           .keep_all = TRUE) ## 10,420
+
+#twins_df %>% group_by(logID) %>% summarise(n=n()) %>% nrow(.)
+
+twins_df %>% group_by(size) %>% summarise(n=n())
+twins_df %>% filter(size==10) %>% group_by(logID) %>% summarise(n=n()) %>% nrow(.)
+twins_df %>% filter(size==25) %>% group_by(logID) %>% summarise(n=n()) %>% nrow(.)
+
+twins_df %>% group_by(size,difficulty) %>% summarise(n=n())
+twins_df %>% filter(size==25 & difficulty==3) %>% group_by(logID) %>% summarise(n=n()) %>% nrow(.)
+twins_df %>% filter(size==25 & difficulty==4) %>% group_by(logID) %>% summarise(n=n()) %>% nrow(.)
+twins_df %>% filter(size==10 & difficulty==3) %>% group_by(logID) %>% summarise(n=n()) %>% nrow(.)
+twins_df %>% filter(size==10 & difficulty==4) %>% group_by(logID) %>% summarise(n=n()) %>% nrow(.)
+
+
+encounter_data_top <- read.csv("encounter_data_topLogs_2023_09_24.csv")
+
+#encounter_data %>% filter(encounterID!=0) %>% group_by(logID) %>% summarise(n=n()) %>% nrow(.)
+
+twins_df_top <- ## 13,567
+encounter_data_top %>% filter(encounterID!=0) %>% 
+  filter(encounterID==641 & duration_s>=50) 
+
+#twins_df %>% group_by(logID) %>% summarise(n=n()) %>% nrow(.)
+
+
+twins_df_top <- twins_df_top%>%
+  
+  mutate(duration_s_filter = round(duration_s,1),
+         logdate = as.Date(logStart))%>%
+  
+  distinct(difficulty, size, kill, fightPercentage, 
+           duration_s_filter, averageItemLevel,logdate,
+           .keep_all = TRUE) ## 10,420
+
+```
+
+## Download Essence and Ability
+
+```{r}
+#65874 - Shield of Darkness
+#65858- Shield of Lights
+
+#66058 - Dark Vortex 
+#66046 - Light Vortex
+
+#65684 - Dark Essence
+#65686 - Light Essece
+TWinEssence <-"ability.id in (65684,65686) or type = 'combatantinfo'"
+
+
+TwinAblity <-"ability.id in (65874,65858,66058,66046)"
+```
+
+
+```{r}
+twins_df <- bind_rows(twins_df_top,twins_df)
+```
+
+### - Essence
+
+```{r}
+df_select <- twins_df  %>%
+  select(logID,fightID) 
+
+#### -balancection Initial specs
+request_logs_code <- sprintf(request_twins_essence_str,
+                             df_select$logID,
+                             df_select$fightID,
+                             TWinEssence)
+
+request_logs_code <- request_logs_code
+
+n_total <- length(request_logs_code)
+
+output <- lapply(seq_along(request_logs_code), function(i) {  
+  
+  
+  response <- WCL_API2_request(request_logs_code[i]
+  )$data$reportData$report$events$data
+  
+  if (!is.null(response) & length(response)>0) {
+    response <- response %>%
+      mutate(logID =  as.character(twins_df$logID[i]),
+             fightID = as.integer(twins_df$fightID[i]),
+             size = as.integer(twins_df$size[i]),
+             difficulty = as.integer(twins_df$difficulty[i]),
+             kill = as.integer(twins_df$kill[i]),
+             startTime = as.integer(twins_df$startTime[i]),
+             duration_s = as.integer(twins_df$duration_s[i]),
+             logNote = as.character(twins_df$logNote[i]),
+             averageItemLevel = as.character(twins_df$averageItemLevel[i]),
+             fightPercentage = as.character(twins_df$fightPercentage[i])
+             
+      )
+  } else {
+    response <- data.frame(timestamp=-1,
+                           logID = as.character(twins_df$logID[i]),
+                           fightID = as.integer(twins_df$fightID[i]),
+                           size = as.integer(twins_df$size[i]),
+                           difficulty = as.integer(twins_df$size[i]),
+                           kill = as.integer(twins_df$kill[i]),
+                           startTime = as.integer(twins_df$startTime[i]),
+                           duration_s = as.integer(twins_df$duration_s[i]),
+                           logNote = as.character(twins_df$logNote[i]),
+                           averageItemLevel = as.character(twins_df$averageItemLevel[i]),
+                           fightPercentage = as.character(twins_df$fightPercentage[i])
+    )
+  }
+  
+  if (i %% 100 == 0) {
+    cat("Processed encounter",i, "out of", n_total,"Twin Valkyr Encounters\n")
+  }
+  
+  return(response)
+})
+
+output2 <- do.call(bind_rows, output)
+
+
+output3<- output2 %>%
+  filter(type != "combatantinfo") %>%
+  
+  select(timestamp,logID,fight,fightID,type,sourceID,targetID,abilityGameID,
+         #hitPoints,maxHitPoints,
+         #x,y,
+         size,difficulty,kill,startTime,duration_s,averageItemLevel,fightPercentage,logNote) 
+
+
+
+write.csv(output3,paste0("./output_twinsvalkyr_essence_",format(Sys.time(), "%Y_%m_%d_h%H_m%M"),".csv"))
+saveRDS(output2, paste0("./output_full_twinsvalkyr_essence_",format(Sys.time(), "%Y_%m_%d_h%H_m%M"),".rds"))
+
+
+#output2_test <- readRDS("./output_full_twinsvalkyr_2023_09_23_h07_m21.rds")
+
+```
+
+### - Ability
+
+```{r}
+df_select <- twins_df  %>%
+  select(logID,fightID) 
+
+#### -balancection Initial specs
+request_logs_code <- sprintf(request_twins_cast_str,
+                             df_select$logID,
+                             df_select$fightID,
+                             TwinAblity)
+
+request_logs_code <- request_logs_code
+
+n_total <- length(request_logs_code)
+
+output <- lapply(seq_along(request_logs_code), function(i) {  
+  
+  
+  response <- WCL_API2_request(request_logs_code[i]
+  )$data$reportData$report$events$data
+  
+  if (!is.null(response) & length(response)>0) {
+    response <- response %>%
+      mutate(logID =  as.character(twins_df$logID[i]),
+             fightID = as.integer(twins_df$fightID[i]),
+             size = as.integer(twins_df$size[i]),
+             difficulty = as.integer(twins_df$difficulty[i]),
+             kill = as.integer(twins_df$kill[i]),
+             startTime = as.integer(twins_df$startTime[i]),
+             duration_s = as.integer(twins_df$duration_s[i]),
+             logNote = as.character(twins_df$logNote[i]),
+             averageItemLevel = as.character(twins_df$averageItemLevel[i]),
+             fightPercentage = as.character(twins_df$fightPercentage[i])
+             
+      )
+  } else {
+    response <- data.frame(timestamp=-1,
+                           logID = as.character(twins_df$logID[i]),
+                           fightID = as.integer(twins_df$fightID[i]),
+                           size = as.integer(twins_df$size[i]),
+                           difficulty = as.integer(twins_df$size[i]),
+                           kill = as.integer(twins_df$kill[i]),
+                           startTime = as.integer(twins_df$startTime[i]),
+                           duration_s = as.integer(twins_df$duration_s[i]),
+                           logNote = as.character(twins_df$logNote[i]),
+                           averageItemLevel = as.character(twins_df$averageItemLevel[i]),
+                           fightPercentage = as.character(twins_df$fightPercentage[i])
+    )
+  }
+  
+  if (i %% 100 == 0) {
+    cat("Processed encounter",i, "out of", n_total,"Twin Valkyr Encounters\n")
+  }
+  
+  return(response)
+})
+
+output2 <- do.call(bind_rows, output)
+
+
+output3<- output2 %>%
+  filter(type != "combatantinfo") %>%
+  
+  select(timestamp,logID,fight,fightID,type,sourceID,targetID,abilityGameID,
+         #hitPoints,maxHitPoints,
+         #x,y,
+         size,difficulty,kill,startTime,duration_s,averageItemLevel,fightPercentage,logNote) 
+
+
+
+write.csv(output3,paste0("./output_twinsvalkyr_essence_",format(Sys.time(), "%Y_%m_%d_h%H_m%M"),".csv"))
+saveRDS(output2, paste0("./output_full_twinsvalkyr_essence_",format(Sys.time(), "%Y_%m_%d_h%H_m%M"),".rds"))
+
+
+#output2_test <- readRDS("./output_full_twinsvalkyr_2023_09_23_h07_m21.rds")
+
+```
+
+
+## Process all data
+
+### - Load
+
+```{r}
+df_special <- read.csv("output_twinsvalkyr_2023_09_24_h23_m13.csv") %>% 
+  select(-c(X))
+
+dfexe <- read.csv("./raw_data/top_logs/df_rankings_execution_2023_09_23_h14_m28.csv")
+dfprog <- read.csv("./raw_data/top_logs/df_rankings_progress_2023_09_23_h14_m27.csv")
+dfspeed <- read.csv("./raw_data/top_logs/df_rankings_speed_2023_09_23_h14_m26.csv")
+
+
+essence <- read.csv("output_twinsvalkyr_essence_2023_09_25_h09_m37.csv") %>% 
+  select(-c(X,logNote)) %>%
+  distinct(across(everything())) #5012072
+
+```
+
+### - Essence data
+
+```{r}
+
+df_essence <- essence %>%
+  group_by(logID,fightID,abilityGameID) %>%
+  summarise(n=n()) %>%
+
+  ungroup() %>%
+
+  pivot_wider(names_from = abilityGameID,
+              values_from = n) %>%
+
+  clean_names() %>% rename("Dark"=x65684,
+                           "Light"=x65686)%>%
+  filter(!is.na(log_id)) %>%
+  filter(!is.na(fight_id)) %>%
+  mutate_if(is.integer, ~coalesce(., 0)) %>%
+
+  mutate(Raid_Color = ifelse(Dark/Light<=2  & Dark/Light>=0.5,"Uncertain",
+                             ifelse(Dark>Light &  Dark/Light>=2,"Dark","Light")))
+```
+
+### - Region data
+
+```{r}
+region <- dfspeed %>% select(logID=report.code,
+                             fightID = report.fightID,
+                             server.region)
+```
+
+### - Ranking data
+
+```{r}
+dfexe <- dfexe %>% select(logID = report.code,
+                          fightID = report.fightID) %>%
+  mutate(Exe = "Execution")%>%
+  filter(!is.na(logID))%>%
+  filter(!is.na(fightID))
+
+dfprog <- dfprog %>% select(logID = report.code,
+                          fightID = report.fightID) %>%
+  mutate(Prog = "Progression")%>%
+  filter(!is.na(logID))%>%
+  filter(!is.na(fightID))
+
+dfspeed <- dfspeed %>% select(logID = report.code,
+                          fightID = report.fightID) %>%
+  mutate(Speed = "Speed")%>%
+  filter(!is.na(logID))%>%
+  filter(!is.na(fightID))
+```
+
+
+```{r}
+abcde <- full_join(dfexe,dfprog,by=c("logID","fightID")) %>%
+  full_join(dfspeed,by=c("logID","fightID"))
+
+
+df_tag <- abcde %>%
+  mutate(logNote2 = case_when(
+    Exe=="Execution" & Speed=="Speed"~ "Exec. & Speed",
+    Speed=="Speed" & is.na(Exe) ~ "Speed",
+    Exe=="Execution" & is.na(Speed)  ~ "Execution",
+    .default = NA)  )%>%
+  filter(!is.na(logNote2)) %>%
+  select(-c(Exe,Speed,Prog,fightID)) %>%
+  distinct(logID,logNote2)
+
+rm(abcde)
+```
+
+### - Log status data
+
+```{r}
+logStatus <- df_special %>%
+
+  group_by(logID,fightID,kill) %>%
+  summarise(n=n()) %>%
+
+  ungroup() %>%
+
+  pivot_wider(names_from = kill,values_from = n) %>%
+  group_by(logID) %>%
+  summarise(`1`=sum(`1`,na.rm=T),
+            `0`=sum(`0`,na.rm = T)) %>%
+
+  ungroup() %>%
+
+  mutate(logStatus = ifelse(`0`==0,"One-shot","Log w/ wipe(s)"))
+```
+
+### - df_final
+
+```{r}
+
+## Remove duplicated events - The random and topranking samples were filtered independently, but when merged had some repetitions. (i.e. they were in the random sample and in the top ranking sample)
+df_special <- df_special[!(duplicated(df_special[, -which(names(df_special) == "logNote")]) | duplicated(df_special[, -which(names(df_special) == "logNote")], fromLast = TRUE)) | df_special$logNote == "Top Logs", ]
+
+
+
+df_special_v2 <- df_special  %>%
+
+  filter(type =="cast") %>%
+
+  mutate(
+    special = case_when(
+      abilityGameID==65874 ~ "SoD",
+      abilityGameID==66058 ~ "DV",
+      abilityGameID==65858 ~ "SoL",
+      abilityGameID==66046 ~ "LV",
+      .default = NA),
+    timestamp_s = (timestamp-startTime)/1000,
+
+    f_special = factor(special,
+                       labels=c("SoD","DV","SoL","LV"), levels=c("SoD","DV","SoL","LV")),
+
+    f_kill = ifelse(kill==1,"Kill","Wipe"),
+    f_diff = ifelse(difficulty==3,"Normal","Heroic"),
+    logNote = ifelse(logNote=="Top Logs","Top Ranked Logs",logNote)
+  ) %>%
+
+ # filter(timestamp_s >=35 & timestamp_s<=235) %>%
+
+  group_by(logID,fightID) %>%
+  mutate(Cast_Seq = row_number()) %>%
+  ungroup()  %>%
+
+
+  left_join(df_tag,by=c("logID")) %>%
+  mutate(logNote3 = ifelse(!is.na(logNote2),logNote2,logNote)) %>%
+  filter(logNote3 != "Top Ranked Logs") %>%
+  mutate(f_logNote3 =  factor(logNote3,
+                              labels=c("Random Logs","Execution","Speed","Exec. & Speed"),
+                              levels=c("Random Logs","Execution","Speed","Exec. & Speed"))) %>%
+
+
+  filter(f_diff=="Heroic" & size==25) %>%
+
+
+  left_join(logStatus,by=c("logID")) %>%
+  mutate(logStatus =  factor(logStatus,
+                              labels=c("One-shot","Log w/ wipe(s)"),
+                              levels=c("One-shot","Log w/ wipe(s)")))
+
+```
+
+## Plotting
+
+```{r}
+source(file = "./scripts/2_0_plot_setting.R")
+library(ggpubr)
+library(ggExtra)
+library("ggplotify")
+
+```
+
+
+```{r}
+scale_factor = 2.65
+
+# ` variable name `     |n      or | or
+#"forge-"    
+#e901 github
+#e900 discord
+font_add(family = "forgefooter", "forgefooter.ttf")
+font_import()
+showtext_auto(TRUE)
+```
+
+### - Plots 1 to 5
+```{r}
+source(file = "./plots/plot1.R")
+source(file = "./plots/plot2.R")
+source(file = "./plots/plot3.R")
+source(file = "./plots/plot4.R")
+source(file = "./plots/plot5.R")
+
+coliseum <- readJPEG("_img/icon/Coliseum 4.jpg")
+```
+
+
+### - Plots 6 to 12
+
+```{r}
+source(file = "./plots/plot6.R")
+source(file = "./plots/plot7.R")
+source(file = "./plots/plot8.R")
+source(file = "./plots/plot9.R")
+source(file = "./plots/plot10.R")
+source(file = "./plots/plot11.R")
+source(file = "./plots/plot12.R")
+```
+
+### - Regional Plotting
+
+```{r}
+source(file = "./plots/region_plot.R")
+```
+
+
+```{r}
+source(file = "./plots/plot_A.R")
+source(file = "./plots/plot_B_C.R")
+source(file = "./plots/plot_D.R")
+source(file = "./plots/plot_E.R")
+
+```
+
+```{r}
+df_interm <- df_special_v2  %>% filter(Cast_Seq==1 & logNote3=="Random Logs")
+
+
+  ggplot() +
+
+  geom_histogram(data=df_interm %>% filter(special=="SoD"),aes(x=hitPoints),fill="#333333",alpha=0.5) +
+    geom_histogram(data=df_interm %>% filter(special=="DV"),aes(x=hitPoints),fill="#000000",alpha=0.5) +
+    geom_histogram(data=df_interm %>% filter(special=="SoL"),aes(x=hitPoints),fill="#FFF0C1",alpha=0.5) +
+    geom_histogram(data=df_interm %>% filter(special=="LV"),aes(x=hitPoints),fill = "#FFEB99",alpha=0.5) +
+
+  #scale_fill_manual(values=c("#333333","#000000","#FFF0C1","#FFEB99")) +
+  scale_y_continuous(labels=function(x) format(x, big.mark = ",", scientific = FALSE))
+
+```
+
+## Canvas 1
+
+```{r}
+plot_A <- magick::image_read("./_img/plot_A.png")
+plot_B <- magick::image_read("./_img/plot_D.png")
+plot_C <- magick::image_read("./_img/plot_B.png")
+plot_D <- magick::image_read("./_img/plot_C.png")
+plot_E <- magick::image_read("./_img/plot_zoom.png")
+
+canvas <- image_blank(width = 2900, height = 2340)
+
+canvas <- image_composite(canvas, plot_B, offset = "+2200+0",operator = "over")
+
+canvas <- image_composite(canvas, plot_C, offset = "+1450+50",operator = "over")
+canvas <- image_composite(canvas, plot_D, offset = "+1450+750",operator = "over")
+
+canvas <- image_composite(canvas, plot_A, offset = "+0+0",operator = "over")
+canvas <- image_composite(canvas, plot_E, offset = "+0+1500",operator = "over")
+
+
+
+image_write(canvas,paste0("./_img/twins_final4_",format(Sys.time(), "%Y_%m_%d_h%H_m%M"),".png"))
+```
+
+## Canvas 2
+
+```{r}
+plot_A <- magick::image_read("./_img/plot_A.png")
+plot_B <- magick::image_read("./_img/plot_D.png")
+
+plot_C <- magick::image_read("./_img/plot_B.png")
+plot_D <- magick::image_read("./_img/plot_C.png")
+
+canvas <- image_blank(width = 3000, height = 1500)
+
+
+canvas <- image_composite(canvas,plot_C , offset = "+1450+0",operator = "over")
+canvas <- image_composite(canvas, plot_B, offset = "+1450+680",operator = "over")
+
+canvas <- image_composite(canvas, plot_A, offset = "+0+0",operator = "over")
+
+canvas <- image_composite(canvas, plot_D, offset = "+2275+680",operator = "over")
+
+
+image_write(canvas,paste0("./_img/twins_final5_",format(Sys.time(), "%Y_%m_%d_h%H_m%M"),".png"))
+
+
+```
+
+### - Extra plotting
+
+```{r}
+
+plot_test <- df_special_v2  %>% filter(Cast_Seq<=2 & logNote3=="Random Logs" & duration_s>=95) %>%
+
+  left_join(df_essence,by=c("logID"="log_id",
+                            "fightID"="fight_id")) %>%
+
+  filter(!is.na(Raid_Color) & Raid_Color != "NA" & Raid_Color !="Uncertain") %>% #group_by(special) %>% summarise(n=n())%>%
+
+  select(logID,fightID,kill,f_special,Cast_Seq) %>%
+
+  pivot_wider(names_from = Cast_Seq,
+              values_from = f_special) %>% clean_names() %>%
+
+  filter(!is.na(x2)) %>%
+
+  mutate(`Ability Sequence`=paste0(x1,"-",x2)) %>%
+
+  mutate(`Ability Sequence`=factor(`Ability Sequence`,
+                                   levels=c(  "SoD-DV","SoD-LV","SoD-SoL",
+                                              "DV-SoD","DV-SoL","DV-LV",
+                                              "SoL-DV","SoL-LV","SoL-SoD",
+                                              "LV-SoL","LV-SoD","LV-DV")),
+         x1 = factor(x1,
+                       labels=c("SoD","DV","SoL","LV"), levels=c("SoD","DV","SoL","LV")),
+         x2 = factor(x2,
+                            labels=c("SoD","DV","SoL","LV"), levels=c("SoD","DV","SoL","LV"))) %>%
+
+
+
+
+  ggplot() +
+
+  geom_bar(aes(x=x2,fill=x2)) +
+
+  scale_fill_manual(values=c("#333333",
+                             "#000000",
+                             "#FFF0C1",
+                             "#FFEB99")) +
+  scale_y_continuous(labels=function(x) format(x, big.mark = ",", scientific = FALSE))+
+  vivax_theme()+
+  theme(axis.text.x = element_markdown(size= scale_factor * 6,
+                                       angle=0,hjust=0.5,vjust=0.6,
+                                       margin = margin(t = 0,l=0, unit = "pt"),lineheight = 0),
+        plot.caption = element_markdown(face = "italic",
+                                        hjust = 0,
+                                        vjust=0,
+                                        size = scale_factor * 8,
+                                        lineheight=0.3,
+                                        margin = margin(t = 5,
+                                                        l=0,
+                                                        unit = "pt")),
+        plot.title = element_markdown(face = "bold",
+                                      size = scale_factor * 16,
+                                      hjust = 0,
+                                      margin = margin(b = 2)),
+        plot.subtitle = element_markdown(lineheight = 0.35),
+        axis.text = element_markdown(size= scale_factor * 6),
+        axis.title.x  = element_markdown(margin = margin(b = -10))
+  ) +
+  guides(size="none",alpha="none",fill="none",color="none")+
+  labs(y="", x="",
+
+       title="", subtitle="") +
+ #geom_vline(xintercept=c(3.5,6.5,9.5),linetype="dashed") +
+  facet_wrap(.~x1,nrow=1)#,
+
+#   caption=c("<p><span style='font-family:forgefooter'>&#xe900;</span> &emsp; discord.gg/wp55kqmyYG - Discfordge &#91;Vivax-Pagle(US)&#93; <br> <span style='font-family:forgefooter'>&#xe901;</span> https:&#47;&#47;www&#46;github.com/ForgeGit/TwinValks</p>")) #+                                                           # Remove axis labels & ticks
+
+
+
+ggsave(paste0("./_img/plot_test_25.png"),plot_test,
+       width = 10, height =2,units="in",device = "png",dpi=300)
+
+plot_test
+
+
+
+
+g <- ggplot_gtable(ggplot_build(plot_test))
+strip_both <- which(grepl('strip-', g$layout$name))
+fills <- c("#333333",
+           "#000000",
+           "#FFF0C1",
+           "#FFEB99")
+text_colors <- c("white", "white", "black", "black")
+k <- 1
+for (i in strip_both) {
+  # Identify the rectangle representing the fill color
+  j <- which(grepl('rect', g$grobs[[i]]$grobs[[1]]$childrenOrder))
+
+  # Modify fill color
+  g$grobs[[i]]$grobs[[1]]$children[[j]]$gp$fill <- fills[k]
+
+  # Modify text color using theme
+  g$grobs[[i]]$grobs[[1]]$children[[2]]$children[[1]]$gp$col <- text_colors[k]
+
+  k <- k + 1
+}
+
+# Draw the modified plot
+ grid.draw(g)
+
+
+a<- as.ggplot(g)
+
+ggsave(paste0("./_img/plot_test_25.png"),a,
+       width = 10.2, height =2.8,units="in",device = "png",dpi=300)
+
+
+
+```
+
+
+
+```{r}
+df_master<- df_cope_spriest_master
+df_interim <- df_cope_spriest_buffs_interm
+
+class_wow <- "spriest"
+class_wow_color <- "#7F1B0E"
+
+```
+
+
+
+
+#### -Canvas
+
+
+##### *Title 
+
+```{r} 
+###
+title <- ggplot() +
+  vivax_theme_title() + 
+  labs(title="<p> Trial of the Crusader (ToC) 25-man Raid<br>Stats for <b><span style='color:#7F1B0E;'>Shadow Priests</span></b> rankings - <b><span style='color:#E0C97D;'>Top 100</span></b> and <b><span style='color:#E268A8;'>Top 300</span></b></p>",
+       subtitle="<p>  </p>") +                                                   # Remove grid, color & borders
+  theme(axis.line = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank(),
+        plot.title = element_markdown(face = "bold",
+                                      size = scale_factor * 18,
+                                      hjust = 0, 
+                                      margin = margin(b = -1)))
+
+ggsave("./_img/transition/plot_title.png",title, 
+       width = 10, height =4,units="in",device = "png",dpi=300)
+
+plot_title  <- magick::image_read("./_img/transition/plot_title.png")
+```
+
+##### *Subtitle 
+
+```{r} 
+title <- ggplot()  +
+  vivax_theme_title() + 
+  labs(title="",
+       subtitle="<p>Data from publicly uploaded logs to Warcraft Logs Classic from Aug 29 2023 21:00 to Sep 01 2023 21:00<br> <b><span style='color:#464646;'>Lower Spire</span>, <span style='color:#397000;'>Plague</span>, <span style='color:#6D0027;'>Blood</span></b> and <b><span style='color:#040A54;'>Frost</span></b> wing bosses + <b>The Frozen Throne (Lich King)</b></p>") +                                                   # Remove grid, color & borders
+  theme(axis.line = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank())
+
+ggsave("./_img/transition/plot_subtitle.png",title, 
+       width = 12, height =4,units="in",device = "png",dpi=300)
+
+plot_title_2  <- magick::image_read("./_img/transition/plot_subtitle.png")
+```
+
+
+##### *Blank
+```{r} 
+###
+title <- ggplot()  +
+  vivax_theme_title() + 
+  labs(title="",
+       subtitle="") +                                                   # Remove grid, color & borders
+  theme(axis.line = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank())
+
+
+
+ggsave("./_img/transition/plot_title_white.png",title, 
+       width = 12, height =4,units="in",device = "png",dpi=300)
+
+
+
+plot_title_white  <- magick::image_read("./_img/transition/plot_title_white.png")
+```
