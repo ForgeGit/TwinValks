@@ -1,12 +1,13 @@
-# 🤍Val'kyr Twins Special Ability order🖤<br/>Mechanics<br/>
+# 🤍Val'kyr Twins Special Ability order🖤
 
-_Vivax (Pagle-US) -_ `Discfordge` _(Discord);_ `cat_nip` _(Discord)_
+_Vivax (Pagle-US) -_ `Discfordge` _(Discord);_ <br />
+`cat_nip` _(Discord)_
 
-> Is the order of Twins special ability "random"?
+> Is the sequence of special abilities for the Val'Kyr Twins "random"?
 
-The following document describes the non-equal probability of "Val'Kyr Twins" special abilities in their Classic version of World of Warcraft: Wrath of the Lich King (2023) - Phase 3.
+The following document describes the unequal probability of "Val'Kyr Twins" special abilities in their Classic version of World of Warcraft: Wrath of the Lich King (2023) - Phase 3.
 
-There is a clear pattern, but we say it is "random" because we can't establish a causal relationship. 
+There is a pattern on their sequence, but we say it is "random" because we can't establish a causal (?) relationship.
  
 ## Introduction
 
