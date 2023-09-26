@@ -1,28 +1,34 @@
-# 🤍Val'kyr Twins🖤<br/>Mechanics<br/>
+# 🤍Val'kyr Twins Special Ability order🖤<br/>Mechanics<br/>
 
-> Is the order of Twins special ability random?
+_Vivax (Pagle-US) -_ `Discfordge` _(Discord);_ `cat_nip` _(Discord)_
 
-The following document goes in-depth describing how the first special ability cast during the encounter with the "Val'Kyr Twins" is rigged, and not entirely random, in their Classic version of World of Warcraft: Wrath of the Lich King (2023) - Phase 3.
+> Is the order of Twins special ability "random"?
 
-# Introduction
+The following document describes the non-equal probability of "Val'Kyr Twins" special abilities in their Classic version of World of Warcraft: Wrath of the Lich King (2023) - Phase 3.
 
-The Val'kyr Twins are the 4th Boss encounter in the raid the Trial of the Crusader (ToC) and every 45s one (1) of four (4) abilities will occur: 
+There is a clear pattern, but we say it is "random" because we can't establish a causal relationship. 
+ 
+## Introduction
 
-- [Light Vortex (LV)](https://www.wowhead.com/wotlk/spell=66046/light-vortex#comments)
+The Val'kyr Twins are the 4th Boss encounter in the raid the Trial of the Crusader (ToC). During the encounter, every 45 seconds one (1) of four (4) abilities will occur : 
 
-- [Shield of Lights (SoL)](https://www.wowhead.com/wotlk/spell=65858/shield-of-lights)
+- [Shield of Darkness (SoD)](https://www.wowhead.com/wotlk/spell=65874/shield-of-darkness)
 
 - [Dark Vortex (DV)](https://www.wowhead.com/wotlk/spell=66058/dark-vortex#comments)
 
-- [Shield of Darkness (SoD)](https://www.wowhead.com/wotlk/spell=65874/shield-of-darkness)
+- [Shield of Lights (SoL)](https://www.wowhead.com/wotlk/spell=65858/shield-of-lights)
+
+- [Light Vortex (LV)](https://www.wowhead.com/wotlk/spell=66046/light-vortex#comments)
 
 The four (4) abilities are cycled through before repeating.
 
 <img src="_img/Abilities.jpg" /> <br />
 
-On September 6, 2023, Catnip posted an [exploratory analysis](https://discord.com/channels/253212375790911489/954035835249000509/1148965319256309790) on the distribution of these abilities, and found Shield of Darkness (SoD) as the most commonly first seen ability. 
+## Background
 
-Further exploration of the 500 encounters suggested the order in which the abilities occurred was not arbitrary and heavily favored a specific ability over the others.
+On September 6, 2023, `cat_nip` (Discord User) conducted an [exploratory analysis](https://discord.com/channels/253212375790911489/954035835249000509/1148965319256309790) into the distribution of these abilities. His findings suggested that Shield of Darkness (SoD) was the most frequently observed initial ability cast across a random sample of logs.
+
+Further examination of the 500 encounters sampled indicated that the sequence in which these abilities happened was uniformly distributed. Instead, a distinct bias was observed towards certain abilities.
 
 <img src="_img/Catnip.png" /> <br />
 
@@ -32,7 +38,7 @@ Despite the use of a sampling method that should have guaranteed some degree of 
 
 Let's fix that.
 
-
+## Results
 
 
 

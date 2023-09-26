@@ -691,6 +691,29 @@ df_interm <- df_special_v2  %>% filter(Cast_Seq==1 & logNote3=="Random Logs")
 
 ```
 
+##### *Blank
+```{r} 
+###
+title <- ggplot()  +
+  vivax_theme_title() + 
+  labs(title="",
+       subtitle="") +                                                   # Remove grid, color & borders
+  theme(axis.line = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank())
+
+
+
+ggsave("./_img/plot_title_white.png",title, 
+       width = 4, height =4,units="in",device = "png",dpi=300)
+
+
+
+plot_title_white  <- magick::image_read("./_img/plot_title_white.png")
+```
+
 ## Canvas 1
 
 ```{r}
@@ -737,7 +760,30 @@ canvas <- image_composite(canvas, plot_D, offset = "+2275+680",operator = "over"
 
 image_write(canvas,paste0("./_img/twins_final5_",format(Sys.time(), "%Y_%m_%d_h%H_m%M"),".png"))
 
+```
 
+## Canvas Final
+
+```{r}
+plot_A <- magick::image_read("./_img/plot_A.png")
+plot_B <- magick::image_read("./_img/plot_D.png")
+plot_C <- magick::image_read("./_img/plot_B.png")
+plot_D <- magick::image_read("./_img/plot_C.png")
+
+canvas <- image_blank(width = 2900, height = 1500)
+
+canvas <- image_composite(canvas, plot_title_white, offset = "+1450+0",operator = "over")
+
+canvas <- image_composite(canvas, plot_B, offset = "+2200+0",operator = "over")
+
+canvas <- image_composite(canvas, plot_C, offset = "+1450+50",operator = "over")
+canvas <- image_composite(canvas, plot_D, offset = "+1450+750",operator = "over")
+
+canvas <- image_composite(canvas, plot_A, offset = "+0+0",operator = "over")
+
+
+
+image_write(canvas,paste0("./_img/twins_final4_",format(Sys.time(), "%Y_%m_%d_h%H_m%M"),".png"))
 ```
 
 ### - Extra plotting
@@ -913,28 +959,4 @@ ggsave("./_img/transition/plot_subtitle.png",title,
        width = 12, height =4,units="in",device = "png",dpi=300)
 
 plot_title_2  <- magick::image_read("./_img/transition/plot_subtitle.png")
-```
-
-
-##### *Blank
-```{r} 
-###
-title <- ggplot()  +
-  vivax_theme_title() + 
-  labs(title="",
-       subtitle="") +                                                   # Remove grid, color & borders
-  theme(axis.line = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        panel.border = element_blank(),
-        panel.background = element_blank())
-
-
-
-ggsave("./_img/transition/plot_title_white.png",title, 
-       width = 12, height =4,units="in",device = "png",dpi=300)
-
-
-
-plot_title_white  <- magick::image_read("./_img/transition/plot_title_white.png")
 ```
