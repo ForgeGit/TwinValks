@@ -9,7 +9,7 @@ The following document describes the unequal probability of "Val'Kyr Twins" spec
 
 There is a pattern on their sequence, but we say it is "random" because we can't establish a causal (?) relationship.
 
-> Why would they not be random?
+> Why would they not be random anyways?
 
 ## Introduction
 
