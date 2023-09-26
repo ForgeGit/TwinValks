@@ -5,7 +5,7 @@
 
 > Is the sequence of special abilities for the Val'Kyr Twins "random"?
 
-The following document describes the unequal probability of "Val'Kyr Twins" special abilities in their Classic version of World of Warcraft: Wrath of the Lich King (2023) - Phase 3.
+The following document describes the unequal probability of "Val'Kyr Twins" special ability cast order in their Classic version of World of Warcraft: Wrath of the Lich King (2023) - Phase 3.
 
 There is a pattern on their sequence, but we say it is "random" because we can't establish a causal (?) relationship.
 
