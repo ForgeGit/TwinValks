@@ -44,6 +44,9 @@ Let's fix that.
 
 Using 6,704 Val'kyr Twins encounters (wipes and kills) we can explore the patterns of the boss.
 
+<img src="_img/twins_final4_2023_09_26_h03_m53.png" /> <br />
+
+The pattern cannot be explained by raid essence (Dark/Light), damage dealt to boss (Boss %HP at 45s), position of the raid (left/right, front/back), raid comp (# of healers/# of DPS).
 
 ## Methodology
 
