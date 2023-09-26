@@ -1,6 +1,6 @@
 # 🤍Val'kyr Twins Special Ability order🖤
 
- _Discord_: `Discfordge` [_Vivax (Pagle-US)_] <br />
+ _Discord_: `Discfordge` <sup>[_Vivax (Pagle-US)_]</sup> <br />
  _Discord_: `cat_nip` 
 
 > Is the sequence of special abilities for the Val'Kyr Twins "random"?
