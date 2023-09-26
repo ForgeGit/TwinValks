@@ -32,7 +32,7 @@ plotA <- df_special_v2  %>% filter(Cast_Seq==1 & logNote3=="Random Logs") %>%
   guides(size="none",alpha="none",fill="none",color="none")+
   labs(y="# of Encounters (Wipes & Kills)", x="",
 
-       title="Twin Val&#39;kyr - 1st Special Ability Cast", subtitle="Shield of Darkness (SoD), Dark Vortex (DV), Shield of Lights (SoL), Light Vortex (LV) <br> 6,704 encounters for 25-man Heroic from 20/09 to 22/09 (dd/mm)",
+       title="Val&#39;kyr Twins - 1st Special Ability Cast", subtitle="Shield of Darkness (SoD), Dark Vortex (DV), Shield of Lights (SoL), Light Vortex (LV) <br> 6,704 encounters for 25-man Heroic from 20/09 to 22/09 (dd/mm)",
 
    caption=c("<p><span style='font-family:forgefooter'>&#xe900;</span> &emsp; discord.gg/wp55kqmyYG - Discfordge &#91;Vivax-Pagle(US)&#93; <br> <span style='font-family:forgefooter'>&#xe901;</span> https:&#47;&#47;www&#46;github.com/ForgeGit/TwinValks</p>")) #+                                                           # Remove axis labels & ticks
 
