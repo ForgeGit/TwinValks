@@ -28,9 +28,9 @@ The four (4) abilities are cycled through before repeating.
 
 ## Background
 
-On September 6, 2023, `cat_nip` (Discord User) conducted an [exploratory analysis](https://discord.com/channels/253212375790911489/954035835249000509/1148965319256309790) into the distribution of these abilities. His findings suggested that Shield of Darkness (SoD) was the most frequently observed initial ability cast across a random sample of logs.
+On September 6, 2023, `cat_nip` (Discord User) conducted an [exploratory analysis](https://discord.com/channels/253212375790911489/954035835249000509/1148965319256309790) into the distribution of these abilities. 
 
-Further examination of the 500 encounters sampled indicated that the sequence in which these abilities happened was uniformly distributed. Instead, a distinct bias was observed towards certain abilities.
+His findings suggested that there is a distinct bias towards certain abilities, specifically Shield of Darkness (SoD), which was the most frequently observed initial ability cast. 
 
 <img src="_img/Catnip.png" /> <br />
 
@@ -42,19 +42,18 @@ Let's fix that.
 
 ## Results
 
+Using 6,704 Val'kyr Twins encounters (wipes and kills) we can explore the patterns of the boss.
 
 
+## Methodology
 
+All the data was collected using the [Warcraft Logs Classic API v2](https://articles.classic.warcraftlogs.com/help/api-documentation) and processed with R v.4.2 (R Development Core Team).
 
+Trial of the Crusader (ToC) raids were located in this zone: https://classic.warcraftlogs.com/zone/reports?zone=1018
 
+Duplicated encounters were excluded based on: "Encounter Name", "Difficulty", "Size", "Kill/Wipe", "Boss %", "Fight Length", and "Avg. ilvl".
 
-
-
-
-
-
-
-
+<img src="_img/data_filtering.jpg"/>
 
 
 
