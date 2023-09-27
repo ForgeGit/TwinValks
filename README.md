@@ -46,7 +46,27 @@ Using 6,704 Val'kyr Twins encounters (wipes and kills) we can explore the patter
 
 <img src="_img/twins_final4_2023_09_26_h04_m00.png" /> <br />
 
-The pattern cannot be explained by raid essence (Dark/Light), damage dealt to boss (Boss %HP at 45s), position of the raid (left/right, front/back), raid comp (# of healers/# of DPS).
+The boss seems to consistently cast Shield of Darkness (SoD) more than the other 3 abilities, and this pattern cannot be explained by raid essence (Dark/Light), position of the raid (left/right, front/back) or whether the encounter was a wipe or a kill.
+
+## Extra results
+
+% HP of the boss at time of casting (45s) did not show any significant relationship either.  
+
+<img src="_img/_oldversions/hp.png" /> <br />
+
+These statistics were also explored for different samples from Execution and Speed rankings (top 2,500).
+
+<img src="_img/_oldversions/plot_test_5.png" /> <br />
+
+Slightly unsurprising, Speed rankings show bias in its results, with both DV and SoD being higher than SoL and LV. 
+
+This can be explained in part by logs that are uploaded intentionally omitting the # of wipes, and by the fact that logs in the top speed should be biased towards SoL and DV. 
+
+Notably however, SoD remained high and it is consistent in Execution ranked logs.
+
+<img src="_img/nowipetrust.png" /> <br />
+*3 hours ToC without wipes? Believable I guess*
+
 
 ## Methodology
 
