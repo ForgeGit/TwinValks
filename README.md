@@ -11,7 +11,7 @@ There is a pattern on their sequence, but we say it is "random" because we can't
 
 > Why would they not be random anyways?
 
-[If you want to jump straight to the result, click here or, keep reading ¯\_(ツ)_/¯](https://github.com/ForgeGit/TwinValks#results)
+[Click here to jump to the result or keep reading](https://github.com/ForgeGit/TwinValks#results) `¯\_(ツ)_/¯`
 
 ## Introduction
 
