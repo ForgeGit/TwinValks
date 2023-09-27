@@ -11,6 +11,8 @@ There is a pattern on their sequence, but we say it is "random" because we can't
 
 > Why would they not be random anyways?
 
+[If you want to jump straight to the result, click here or, keep reading ¯\_(ツ)_/¯](https://github.com/ForgeGit/TwinValks#results)
+
 ## Introduction
 
 The Val'kyr Twins are the 4th Boss encounter within the raid of the Trial of the Crusader (ToC). 
