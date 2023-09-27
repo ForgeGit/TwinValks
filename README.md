@@ -79,4 +79,11 @@ Duplicated encounters were excluded based on: "Encounter Name", "Difficulty", "S
 <img src="_img/data_filtering.jpg"/>
 
 
+## Other analysis and random stuff
+
+- If you have questions, you can contact me on discord: https://discord.gg/wp55kqmyYG (Discord: Discfordge)
+
+- Consider buying me a coffee? :) https://ko-fi.com/forge
+
+- Check other things I have done here: https://github.com/ForgeGit?tab=repositories
 
