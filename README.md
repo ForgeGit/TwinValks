@@ -69,6 +69,15 @@ Notably however, SoD remained high and it is consistent in Execution ranked logs
 <img src="_img/nowipetrust.png" /> <br />
 *3 hours ToC without wipes? Believable I guess*
 
+Raid positioning at the moment of cast (45s) was also explored.
+
+<img src="_img/_oldversions/plot_test_7.png" /> <br />
+<img src="_img/_oldversions/plot_test_region.png" /> <br />
+*Funny to think TW/KR have been pulling with Light Essence all along. Is the West wrong? Do they know something we don't?*
+
+Honestly there isn't much more to show but this one looks nice (and i couldn't fit it anywhere else)
+
+<img src="_img/_oldversions/plot_test_9.png" /> <br />
 
 ## Methodology
 
@@ -80,6 +89,9 @@ Duplicated encounters were excluded based on: "Encounter Name", "Difficulty", "S
 
 <img src="_img/data_filtering.jpg"/>
 
+The data used to generate the graphics can be found [in this same repository(https://github.com/ForgeGit/TwinValks/blob/main/Twins_ability_data.csv). 
+
+If you want the full data including 10 man/normal modes you can contact me (It was not uploaded mostly due to size constraints.)
 
 ## Other analysis and random stuff
 

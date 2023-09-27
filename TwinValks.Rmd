@@ -905,19 +905,24 @@ ggsave(paste0("./_img/plot_test_25.png"),a,
 ```{r}
 tag <- data.frame(
   logID = "https://github.com/ForgeGit/TwinValks",
-  special = "https://discord.gg/wp55kqmyYG",
+  f_special = "https://discord.gg/wp55kqmyYG",
   f_logNote3 = "Vivax - Pagle (US)"
 )
 
 
-df_special_v2 %>%
-  select(logID, fightID,duration_s,f_kill,f_logNote3,logStatus,averageItemLevel,
+df_special_v2  %>%
+
+  left_join(df_essence,by=c("logID"="log_id",
+                            "fightID"="fight_id")) %>%
+  
+  select(logID, fightID,duration_s,f_kill,f_logNote3,logStatus,averageItemLevel,Raid_Color,
          f_special,Cast_Seq,
          timestamp_s,
-         hitPoints,x,y
+         hitPoints,x,y,
+         Dark_absorbs_count = Dark ,Light_absorbs_count = Light
          ) %>% 
   bind_rows(tag)%>%
-  write.csv("./Twins_ability_data.csv")
+  write.csv("./Twins_ability_data.csv",row.names = F)
 
 write.csv
 ```
