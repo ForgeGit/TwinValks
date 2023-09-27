@@ -902,6 +902,28 @@ ggsave(paste0("./_img/plot_test_25.png"),a,
 ```
 
 
+```{r}
+tag <- data.frame(
+  logID = "https://github.com/ForgeGit/TwinValks",
+  special = "https://discord.gg/wp55kqmyYG",
+  f_logNote3 = "Vivax - Pagle (US)"
+)
+
+
+df_special_v2 %>%
+  select(logID, fightID,duration_s,f_kill,f_logNote3,logStatus,averageItemLevel,
+         f_special,Cast_Seq,
+         timestamp_s,
+         hitPoints,x,y
+         ) %>% 
+  bind_rows(tag)%>%
+  write.csv("./Twins_ability_data.csv")
+
+write.csv
+```
+
+
+
 
 ```{r}
 df_master<- df_cope_spriest_master
