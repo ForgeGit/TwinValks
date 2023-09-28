@@ -487,6 +487,9 @@ df_essence <- essence %>%
 
   mutate(Raid_Color = ifelse(Dark/Light<=2  & Dark/Light>=0.5,"Uncertain",
                              ifelse(Dark>Light &  Dark/Light>=2,"Dark","Light")))
+
+
+write.csv(df_essence,"./raw_data/RAW_twinsvalkyr_public_essenceonly.csv")
 ```
 
 ### - Region data
