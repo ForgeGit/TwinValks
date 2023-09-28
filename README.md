@@ -84,8 +84,8 @@ Honestly there isn't much more to show but this one looks nice (and i couldn't f
 
 The sequence of abilities for the 2nd, 3rd and 4th cast were also explored by `cat_nip`.
 
-<img src="_img/_oldversions/wipes.png" /> <br />
-<img src="_img/_oldversions/first-pull.png" /> <br />
+<img src="_img/wipes.png" /> <br />
+<img src="_img/first-pull.png" /> <br />
 
 ## Methodology
 
