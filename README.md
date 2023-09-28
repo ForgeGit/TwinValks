@@ -82,6 +82,11 @@ Honestly there isn't much more to show but this one looks nice (and i couldn't f
 
 <img src="_img/_oldversions/plot_test_9.png" /> <br />
 
+The sequence of abilities for the 2nd, 3rd and 4th cast were also explored by `cat_nip`.
+
+<img src="_img/_oldversions/wipes.png" /> <br />
+<img src="_img/_oldversions/first-pull.png" /> <br />
+
 ## Methodology
 
 All the data was collected using the [Warcraft Logs Classic API v2](https://articles.classic.warcraftlogs.com/help/api-documentation) and processed with R v.4.2 (R Development Core Team).
