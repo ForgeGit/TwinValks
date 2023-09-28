@@ -82,9 +82,10 @@ Honestly there isn't much more to show but this one looks nice (and i couldn't f
 
 <img src="_img/_oldversions/plot_test_9.png" /> <br />
 
-The sequence of abilities for the 2nd, 3rd and 4th cast were explored by `cat_nip`. The size of each node and connection denotes the ratio of occurrences in the dataset. The first diagram shows data from the first pull of random logs (to eliminate survivorship bias), the second diagram shows sequences on wipes only.
-
+When looking at the distribution of sequences up to the 4th ability, we see that the sequence SoD -> DV -> SoL -> LV is heavily favored. The following diagram shows the distribution of abilities for the 1st to 4th and the connections show the sequence flow. The size of each node and connection denotes the ratio of occurrences in the dataset. To avoid survivorship bias as much as possible, only the first pull of each log was taken into account.
 <img src="_img/first-pull.png" /> <br />
+
+As expected, the sequence flow for wipes only shows a much higher number of the less likely sequences, probably throwing raids off:
 <img src="_img/wipes.png" /> <br />
 
 ## Methodology
