@@ -82,10 +82,10 @@ Honestly there isn't much more to show but this one looks nice (and i couldn't f
 
 <img src="_img/_oldversions/plot_test_9.png" /> <br />
 
-The sequence of abilities for the 2nd, 3rd and 4th cast were also explored by `cat_nip`.
+The sequence of abilities for the 2nd, 3rd and 4th cast were explored by `cat_nip`. The size of each node and connection denotes the ratio of occurrences in the dataset. The first diagram shows data from the first pull of random logs (to eliminate survivorship bias), the second diagram shows sequences on wipes only.
 
-<img src="_img/wipes.png" /> <br />
 <img src="_img/first-pull.png" /> <br />
+<img src="_img/wipes.png" /> <br />
 
 ## Methodology
 
