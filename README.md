@@ -86,7 +86,7 @@ When looking at the distribution of sequences up to the 4th ability, we see that
 <img src="_img/first-pull2.png" /> <br />
 
 As expected, the sequence flow for wipes only shows a much higher number of the less likely sequences, probably throwing raids off:
-<img src="_img/wipes.png2" /> <br />
+<img src="_img/wipes2.png" /> <br />
 
 ## Methodology
 
