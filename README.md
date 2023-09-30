@@ -14,7 +14,7 @@ There is a pattern that repeats across different kill types, raid essence color,
 
 > Why would they not be random anyways?
 
-[Click here to jump to the result or keep reading](https://github.com/ForgeGit/TwinValks#results) `¯\_(ツ)_/¯`
+[Click here to jump to the result](https://github.com/ForgeGit/TwinValks#results) or keep reading `¯\_(ツ)_/¯`
 
 ## Introduction
 
