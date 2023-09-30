@@ -5,9 +5,12 @@
 
 > Is the sequence of special abilities for the Val'Kyr Twins "random"?
 
+It is "random" because to the best of our knowledge we cannot "control" it.<br />
+However, there is one ability that is __first__ cast more often than the others.
+
 The following document describes the unequal probability of "Val'Kyr Twins" special ability cast order in their Classic version of World of Warcraft: Wrath of the Lich King (2023) - Phase 3.
 
-There is a pattern on their sequence, but we say it is "random" because we can't establish a causal (?) relationship.
+There is a pattern that repeats across different kill types, raid essence color, and that has been consistent since first reported early in September 6th, 2023.
 
 > Why would they not be random anyways?
 
